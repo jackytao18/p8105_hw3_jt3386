@@ -139,3 +139,34 @@ accel_df
 
 The resulting dataset `accel_df` has `r nrow(accel_df)` rows and `r ncol(accel_df)` columns. The variables include `r names(accel_df)`. It shows the activity counts of each minute during 35 days.
 
+We then aggregate across minutes to create a total activity variable for each day, and create a table showing these totals. 
+```{r}
+accel_df %>% 
+  group_by(week,day) %>% 
+  summarise(total_activity = sum(activity_counts)) %>% 
+  pivot_wider(
+    names_from = day,
+    values_from = total_activity
+  ) %>% 
+  knitr::kable()
+```
+
+We can see 2 observations show the total activity counts are 1440 with 1 for each minute. That may be a mistake or the patient just did not wear the accelerometers on that day. To be honest, I did not see any trends according to the table because the data fluctuates greatly. Maybe the mean total activity counts is around 300K or 400K, but we need further information to make judgement.
+
+The single-panel plot below shows the 24-hour activity time courses for each day and use color to indicate day of the week.
+
+```{r}
+accel_df %>% 
+  ggplot(aes(x = minute, y = activity_counts, color = day_of_week)) +
+  geom_line(alpha = .5) +
+  scale_x_continuous(
+    breaks = c(0, 360, 720, 1080, 1440),
+    labels = c("0", "6", "12", "18", "24")
+  )+
+  labs(
+    x = "Time from Midnight(h)",
+    y = "Activity Counts",
+  ) 
+```
+
+Based on this graph, generally the activity counts are low during the first 6 hours of a day because of sleeping. The activity counts of weekday is higher in the evening like 19:00 to 22:00, and the activity counts of weekend peek in the noon and afternoon about 17:00.
