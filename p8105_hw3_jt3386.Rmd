@@ -170,3 +170,18 @@ accel_df %>%
 ```
 
 Based on this graph, generally the activity counts are low during the first 6 hours of a day because of sleeping. The activity counts of weekday is higher in the evening like 19:00 to 22:00, and the activity counts of weekend peek in the noon and afternoon about 17:00.
+
+
+### Problem 3
+
+We first read the data from `ny_noaa`.
+
+```{r}
+data("ny_noaa")
+ny_noaa
+```
+
+The raw dataset has `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. The variables include `r names(ny_noaa)`. `id` indicates weather station ID, `date` indicates date of observation, `prcp` indicates precipitation, `snow` indicates snowfall, `snwd` indicates snow depth, `tmax` indicates maximun temperature, and `tmin` indicates minimun temperature. However, `r nrow(drop_na(ny_noaa)) / nrow(ny_noaa) * 100`% of the observations contain missing value.
+
+
+
