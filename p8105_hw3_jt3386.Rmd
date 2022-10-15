@@ -110,3 +110,32 @@ instacart %>%
 We could find that Pink Lady Apples are generally purchased slightly earlier in the day than Coffee Ice Cream except Friday.
 
 
+### Problem 2
+
+We first load and tidy the data. We add an variable to indicate whether the day is weekday or weekend.
+
+```{r}
+accel_df = 
+  read_csv("data/accel_data.csv") %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = 'minute',
+    values_to = 'activity_counts',
+    names_prefix = 'activity_'
+  ) %>% 
+  mutate(
+    minute = as.integer(minute),
+    day = factor(day, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")),
+    day_of_week = case_when(
+      day == "Saturday" | day == "Sunday" ~ "Weekend",
+      day != "Sunday" & day != "Saturday" ~ "Weekday",
+      TRUE ~ ""
+    )
+  )
+
+accel_df
+```
+
+The resulting dataset `accel_df` has `r nrow(accel_df)` rows and `r ncol(accel_df)` columns. The variables include `r names(accel_df)`. It shows the activity counts of each minute during 35 days.
+
