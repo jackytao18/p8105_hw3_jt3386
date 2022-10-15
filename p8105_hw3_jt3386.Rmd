@@ -30,3 +30,18 @@ options(
 scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
+
+
+### Problem 1
+
+We first read in the data.
+
+```{r}
+data("instacart")
+
+instacart = 
+  instacart %>% 
+  as_tibble(instacart)
+```
+
+This dataset has `r nrow(instacart)` rows and `r ncol(instacart)` columns. The variables include `r names(instacart)`. To be specific, `product_id` and `product_name` refer to what products been ordered, `aisle_id` and `aisle` refer to where the products are, and `department_id` and `department` refer to which department the products belong to. The observations document the order id, the user id, how many products in the order, what are the products, where are the products, whether is reordered or not, and so on. In total, there are `r instacart %>% select(product_id) %>% distinct %>% count` products found in `r instacart %>% select(user_id, order_id) %>% distinct %>% count` orders from `r instacart %>% select(user_id) %>% distinct %>% count` distinct users.
