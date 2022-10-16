@@ -183,5 +183,71 @@ ny_noaa
 
 The raw dataset has `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. The variables include `r names(ny_noaa)`. `id` indicates weather station ID, `date` indicates date of observation, `prcp` indicates precipitation, `snow` indicates snowfall, `snwd` indicates snow depth, `tmax` indicates maximun temperature, and `tmin` indicates minimun temperature. However, `r nrow(drop_na(ny_noaa)) / nrow(ny_noaa) * 100`% of the observations contain missing value.
 
+Then we do some data cleaning.
 
+```{r}
+cleaned_noaa_df =   
+  ny_noaa %>% 
+  separate(date, sep = "-", into = c("year", "month", "day")) %>% 
+  mutate(
+    month = month.name[as.integer(month)],
+    prcp = prcp / 10,
+    tmax = as.integer(tmax) / 10,
+    tmin = as.integer(tmin) / 10
+  )
 
+cleaned_noaa_df %>% 
+  count(snow) %>% 
+  arrange(-n)
+```
+
+For snowfall, the most common value is 0 because there are few days snowing in a year.
+
+Then we make a two-panel plot showing the average max temperature in January and in July in each station across years.
+
+```{r}
+cleaned_noaa_df %>% 
+  filter(month %in% c("January", "July")) %>% 
+  group_by(month, id, year) %>% 
+  summarise(mean_tmax = mean(tmax, na.rm = TRUE)
+  ) %>% 
+  ggplot(aes(x = as.integer(year), y = mean_tmax, color = id)) +
+  geom_point() + 
+  geom_path() +
+  facet_grid(. ~ month) +
+  labs(
+    x = "Year",
+    y = "Average Max Temperature (°C)"
+  ) +
+  theme(legend.position = "none")
+```
+
+From the plots, it seems like both average max temperatures in January and July fluctuate with the year. There are several outliers, for example, there was a very low point in January in 1982 and also a very low point in July in 1988.
+
+The two-panel plot below shows (i) `tmax` vs `tmin` for the full dataset; and (ii) the distribution of snowfall values greater than 0 mm and less than 100 mm separately by year.
+
+```{r}
+tmax_tmin_plot =   
+  cleaned_noaa_df %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex() +
+  labs(
+    x = "Min Temperature (°C)",
+    y = "Max Temperature (°C)"
+  ) +
+  theme(legend.position = "left")
+
+snow_plot =
+  cleaned_noaa_df %>% 
+  filter(
+    snow > 0 & snow < 100
+  ) %>% 
+  ggplot(aes(x = snow, y = year)) +
+  geom_density_ridges() +
+  labs(
+    x = "Snowfall (mm)",
+    y = "Year"
+  )
+
+tmax_tmin_plot + snow_plot
+```
